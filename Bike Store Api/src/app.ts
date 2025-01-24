@@ -1,16 +1,27 @@
-import express, { Request, Response } from 'express';
-import cors from 'cors';
-import router from './app/routes';
-const app = express();
+import cors from "cors";
+import express, { Request, Response, Application } from "express";
+import router from "./app/routes";
+import { globalErrorHandler } from "./app/middlewares/globalErrorHandler";
+const app: Application = express();
 
-// Middleware parsers
+//parsers
 app.use(express.json());
 app.use(cors());
 
-// Application routes
-app.use('/api', router);
-app.get('/', (req: Request, res: Response) => {
-  res.send("welcome to out bike store API!");
+// application routes
+app.use("/api", router);
+
+app.get("/", (req: Request, res: Response) => {
+  res.send({ status: true, message: "welcome to our Bike Store Project API!" });
+});
+
+app.use(globalErrorHandler);
+
+app.use("*", (req: Request, res: Response) => {
+  res.status(404).json({
+    status: false,
+    message: "Route not found",
+  });
 });
 
 export default app;
