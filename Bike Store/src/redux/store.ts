@@ -12,6 +12,7 @@ import {
   REGISTER,
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+import { bikeApi } from './api/bike/bikeApi';
 
 const persistConfig = {
   key: 'auth',
@@ -23,6 +24,7 @@ const persistedAuthReducer = persistReducer(persistConfig, authReducer);
 export const store = configureStore({
   reducer: {
     [baseApi.reducerPath]: baseApi.reducer,
+    [bikeApi.reducerPath]: bikeApi.reducer,
     auth: persistedAuthReducer,
   },
   middleware: (getDefaultMiddlewares) =>
@@ -30,7 +32,7 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }).concat(baseApi.middleware),
+    }).concat(baseApi.middleware,bikeApi.middleware),
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

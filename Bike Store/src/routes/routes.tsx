@@ -7,11 +7,23 @@ import { routeGenerator } from '../utils/routesGenerator';
 import { userPaths } from './user.routes';
 import ProtectedRoute from '../components/layout/ProtectedRoute';
 import ChangePassword from '../pages/ChangePassword';
+import Products from '../pages/user/bike/Products';
+import Product from '../pages/user/bike/Product';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
+    children: [
+      {
+        path: "/products",
+        element: <Products />
+      },
+      {
+        path: "/products/:productId",
+        element: <Product />
+      }
+    ]
   },
   {
     path: '/admin',
