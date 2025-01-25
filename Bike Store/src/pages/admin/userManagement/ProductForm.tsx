@@ -18,7 +18,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ productForm, setProductForm, 
       <Form.Item label="Price" name="price" rules={[{ required: true, message: 'Please input the price!' }]}>
         <InputNumber
           value={productForm.price}
-          onChange={(value) => setProductForm({ ...productForm, price: value })}
+          onChange={(value) => setProductForm({ ...productForm, price: value||0 })}
           style={{ width: '100%' }}
         />
       </Form.Item>
@@ -30,7 +30,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ productForm, setProductForm, 
       >
         <InputNumber
           value={productForm.quantity}
-          onChange={(value) => setProductForm({ ...productForm, quantity: value })}
+          onChange={(value) => setProductForm({ ...productForm, quantity: value||0})}
           style={{ width: '100%' }}
         />
       </Form.Item>

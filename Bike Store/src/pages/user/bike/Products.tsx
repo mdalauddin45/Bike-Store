@@ -1,95 +1,87 @@
-import  { useState } from "react";
-import { useDeleteBikeMutation, useGetAllBikesQuery } from "../../../redux/api/bike/bikeApi";
+import { useState } from "react";
+import { useGetAllBikesQuery } from "../../../redux/api/bike/bikeApi";
 import { useNavigate } from "react-router-dom";
+import { Card, Input, Row, Col, Button, Spin, Typography } from "antd";
+import { toast } from "sonner";
+
+const { Title, Text } = Typography;
+const { Search } = Input;
 
 const Products = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { data: bikes, isLoading, error } = useGetAllBikesQuery(searchTerm);
-  const [deleteBike] = useDeleteBikeMutation();
   const navigate = useNavigate();
 
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this bike?")) {
-      await deleteBike(id);
+  const handleDetails = (id: string) => {
+    try {
+      navigate(`/products/${id}`);
+      toast.success("Navigating to product details...");
+    } catch {
+      toast.error("Failed to navigate to product details.");
     }
   };
-  const handleDetails = (id) => {
-    navigate(`/products/${id}`); 
-  };
 
-  if (isLoading) return <p>Loading bikes...</p>;
-  if (error) return <p>Something went wrong!</p>;
+  if (isLoading)
+    return (
+      <div style={{ textAlign: "center", marginTop: "50px" }}>
+        <Spin size="large" />
+        <p>Loading bikes...</p>
+      </div>
+    );
+
+  if (error) {
+    toast.error("Something went wrong while fetching bikes!");
+    return (
+      <div style={{ textAlign: "center", marginTop: "50px" }}>
+        <Text type="danger">Failed to load bikes. Please try again later.</Text>
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: "20px" }}>
-      <h1>All Bikes</h1>
-      <input
-        type="text"
+      <Title level={2}>All Bikes</Title>
+      <Search
         placeholder="Search by name, brand, or category"
-        value={searchTerm}
-        onChange={handleSearch}
-        style={{
-          marginBottom: "20px",
-          padding: "10px",
-          width: "100%",
-          maxWidth: "400px",
-          display: "block",
-        }}
+        onSearch={handleSearch}
+        allowClear
+        enterButton
+        style={{ marginBottom: "20px", maxWidth: "400px" }}
       />
       {bikes?.data.length > 0 ? (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "20px" }}>
-          {bikes.data.map((bike) => (
-            <div
-              key={bike._id}
-              style={{
-                border: "1px solid #ddd",
-                borderRadius: "8px",
-                padding: "16px",
-                textAlign: "center",
-              }}
-            >
-              <h2>{bike.name}</h2>
-              <p>
-                <strong>Brand:</strong> {bike.brand}
-              </p>
-              <p>
-                <strong>Model:</strong> {bike.model}
-              </p>
-              <p>
-                <strong>Price:</strong> ${bike.price}
-              </p>
-              <p>
-                <strong>Category:</strong> {bike.category}
-              </p>
-             
-              <button
-                onClick={() => handleDelete(bike._id)}
-                style={{ marginTop: "10px", padding: "10px", backgroundColor: "#f44336", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}
+        <Row gutter={[16, 16]}>
+          {bikes.data.map((bike:any) => (
+            <Col key={bike._id} xs={24} sm={12} lg={8}>
+              <Card
+                title={bike.name}
+                bordered
+                hoverable
               >
-                Delete
-              </button>
-              <button
-                onClick={() => handleDetails(bike._id)}
-                style={{
-                  marginTop: "10px",
-                  marginLeft: "10px",
-                  padding: "10px",
-                  backgroundColor: "#2196F3",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                }}
-              >
-                View Details
-              </button>
-            </div>
+                <p>
+                  <Text strong>Brand:</Text> {bike.brand}
+                </p>
+                <p>
+                  <Text strong>Model:</Text> {bike.model}
+                </p>
+                <p>
+                  <Text strong>Price:</Text> ${bike.price}
+                </p>
+                <p>
+                  <Text strong>Category:</Text> {bike.category}
+                </p>
+                <div style={{ marginTop: "10px", textAlign: "right" }}>
+                  <Button type="primary" onClick={() => handleDetails(bike._id)}>
+                    View Details
+                  </Button>
+                </div>
+              </Card>
+            </Col>
           ))}
-        </div>
+        </Row>
       ) : (
         <p>No bikes found.</p>
       )}

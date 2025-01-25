@@ -1,27 +1,28 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useGetBikeByIdQuery } from '../../../redux/api/bike/bikeApi';
-import { toast } from 'sonner';
+import React, { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useGetBikeByIdQuery } from "../../../redux/api/bike/bikeApi";
+import { toast } from "sonner";
+import { Typography, Input, Button, Card, Form, Spin, Space } from "antd";
+
+const { Title, Paragraph, Text } = Typography;
 
 const Checkout = () => {
   const { productId } = useParams();
   const { data: bike, isLoading, error } = useGetBikeByIdQuery(productId!);
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [shippingAddress, setShippingAddress] = useState('');
+  const [shippingAddress, setShippingAddress] = useState("");
   const [totalPrice, setTotalPrice] = useState(0);
 
-  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newQuantity = Math.max(1, parseInt(e.target.value));
+  const handleQuantityChange = (value: number) => {
+    const newQuantity = Math.max(1, value);
     setQuantity(newQuantity);
     if (bike) setTotalPrice(newQuantity * bike.data.price);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
     if (!email || !shippingAddress) {
       toast.error("Please fill in all required fields.");
       return;
@@ -47,7 +48,7 @@ const Checkout = () => {
 
         if (response.ok) {
           toast.success("Order placed successfully!");
-          navigate("/order-success"); // Redirect to a success page
+          navigate("/order-success");
         } else {
           toast.error(data.error || "Something went wrong!");
         }
@@ -59,84 +60,98 @@ const Checkout = () => {
     }
   };
 
-  if (isLoading) return <p>Loading checkout details...</p>;
-  if (error) return <p>Something went wrong!</p>;
+  if (isLoading)
+    return (
+      <div style={{ textAlign: "center", marginTop: "50px" }}>
+        <Spin size="large" />
+        <Text>Loading checkout details...</Text>
+      </div>
+    );
+
+  if (error) {
+    toast.error("Failed to fetch product details.");
+    return (
+      <div style={{ textAlign: "center", marginTop: "50px" }}>
+        <Text type="danger">Something went wrong. Please try again later.</Text>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: 'auto' }}>
-      <h1>Checkout</h1>
-      <div>
-        <h2>{bike?.data.name}</h2>
-        <p><strong>Brand:</strong> {bike?.data.brand}</p>
-        <p><strong>Price:</strong> ${bike?.data.price}</p>
-        <p><strong>Description:</strong> {bike?.data.description}</p>
-        <p><strong>Stock:</strong> {bike?.data.inStock ? 'In stock' : 'Out of stock'}</p>
-      </div>
+    <div style={{ padding: "20px", maxWidth: "800px", margin: "auto" }}>
+      <Title level={2}>Checkout</Title>
+      <Card bordered>
+        <Title level={3}>{bike?.data.name}</Title>
+        <Paragraph>
+          <Text strong>Brand:</Text> {bike?.data.brand}
+        </Paragraph>
+        <Paragraph>
+          <Text strong>Price:</Text> ${bike?.data.price}
+        </Paragraph>
+        <Paragraph>
+          <Text strong>Description:</Text> {bike?.data.description}
+        </Paragraph>
+        <Paragraph>
+          <Text strong>Stock:</Text> {bike?.data.inStock ? "In stock" : "Out of stock"}
+        </Paragraph>
+      </Card>
 
-      <div style={{ marginTop: '20px' }}>
-        <h3>Enter Shipping Information</h3>
-        <form onSubmit={handleSubmit}>
-          {/* Email Input */}
-          <div>
-            <label>Your Email:</label>
-            <input
+      <div style={{ marginTop: "20px" }}>
+        <Title level={4}>Enter Shipping Information</Title>
+        <Form layout="vertical" onFinish={handleSubmit}>
+          <Form.Item
+            label="Your Email"
+            required
+            rules={[{ required: true, message: "Please enter your email" }]}
+          >
+            <Input
               type="email"
-              name="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
-              style={{ padding: '10px', width: '100%' }}
+              placeholder="Enter your email"
             />
-          </div>
+          </Form.Item>
 
-          {/* Quantity Input */}
-          <div>
-            <label>Quantity:</label>
-            <input
+          <Form.Item label="Quantity">
+            <Input
               type="number"
-              name="quantity"
               value={quantity}
-              onChange={handleQuantityChange}
-              min="1"
+              onChange={(e) => handleQuantityChange(Number(e.target.value))}
+              min={1}
               max={bike?.data.inStock || 1}
-              required
-              style={{ padding: '10px', width: '100%' }}
+              placeholder="Enter quantity"
             />
-          </div>
+          </Form.Item>
 
-          {/* Shipping Address Input */}
-          <div>
-            <label>Shipping Address:</label>
-            <input
-              type="text"
-              name="address"
+          <Form.Item
+            label="Shipping Address"
+            required
+            rules={[{ required: true, message: "Please enter your shipping address" }]}
+          >
+            <Input
               value={shippingAddress}
               onChange={(e) => setShippingAddress(e.target.value)}
-              required
-              style={{ padding: '10px', width: '100%' }}
+              placeholder="Enter your shipping address"
             />
-          </div>
+          </Form.Item>
 
-          {/* Total Price */}
-          <div style={{ marginTop: '10px' }}>
-            <p><strong>Total Price:</strong> ${totalPrice}</p>
-          </div>
+          <Space direction="vertical" size="middle" style={{ marginTop: "10px" }}>
+            <Paragraph>
+              <Text strong>Total Price:</Text> ${totalPrice}
+            </Paragraph>
+          </Space>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
+          <Button
+            type="primary"
+            htmlType="submit"
             style={{
-              padding: '12px 24px',
-              backgroundColor: '#4CAF50',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
+              marginTop: "20px",
+              padding: "10px 20px",
             }}
           >
             Complete Purchase
-          </button>
-        </form>
+          </Button>
+        </Form>
       </div>
     </div>
   );
