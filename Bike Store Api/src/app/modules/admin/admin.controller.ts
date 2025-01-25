@@ -91,8 +91,25 @@ const updateUser = catchAsync(async (req, res) => {
       });
     }
   };
+  const getAllBike = async (req: Request, res: Response) => {
+    try {
+      const result = await AdminServices.getAllBikeFromDB();
+      res.status(200).json({
+        success: true,
+        message: 'All Bike retrieved successfully',
+        data: result,
+      });
+    } catch (err: any) {
+      res.status(500).json({
+        success: false,
+        message: err.message || 'Something went wrong',
+        error: err,
+      });
+    }
+  };
   export const AdminControllers = {
     updateUser,
     deleteBike,
-    getAllUser
+    getAllUser,
+    getAllBike
   }

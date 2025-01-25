@@ -14,11 +14,16 @@ const deleteUserFromDB = async (id: string) => {
     return result;
   };
 const getAllUserFromDB = async () => {
-    const result = await User.find();
+    const result = await User.find({ role: "user" });
+    return result;
+  };
+const getAllBikeFromDB = async () => {
+    const result = await Bike.find();
     return result;
   };
 export const AdminServices = {
     updateUserInDB,
     deleteUserFromDB,
-    getAllUserFromDB
+    getAllUserFromDB,
+    getAllBikeFromDB
 }

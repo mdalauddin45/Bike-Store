@@ -15,10 +15,6 @@ export const userPaths = [
     path: "products",
     element: <Products />,
   },
-  {
-    name: "Order Revenue",  
-    path: "order/:productId",  
-    element: <Checkout />,
-  },
+  
   
 ];

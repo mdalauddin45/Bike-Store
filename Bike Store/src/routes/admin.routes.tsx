@@ -1,8 +1,6 @@
 import AdminDashboard from '../pages/admin/AdminDashboard';
-import CreateAdmin from '../pages/admin/userManagement/CreateAdmin';
-import CreateUser from '../pages/admin/userManagement/CreateUser';
-import UserData from '../pages/admin/userManagement/UserData';
-import UserDetails from '../pages/admin/userManagement/UserDetails';
+import { AllProduct } from '../pages/admin/userManagement/AllProduct';
+import { UserData } from '../pages/admin/userManagement/UserData';
 
 export const adminPaths = [
   {
@@ -11,29 +9,19 @@ export const adminPaths = [
     element: <AdminDashboard />,
   },
   {
-    name: 'User Management',
-    children: [
-      {
-        name: 'Create User',
-        path: 'create-user',
-        element: <CreateUser />,
-      },
-      {
-        name: 'All Users',
-        path: 'students-data',
-        element: <UserData />,
-      },
-      {
-        path: 'user-data/:userId',
-        element: <UserDetails />,
-      },
-      {
-        name: 'Create Admin',
-        path: 'create-admin',
-        element: <CreateAdmin />,
-      },
-    ],
-  }
+    name: 'All User',
+    path: 'users',
+    element: <UserData />,
+  },
+  {
+    path: 'users/:id/block',
+    element: <UserData />,
+  },
+  {
+    name:'All Product',
+    path: 'all-product',
+    element: <AllProduct />,
+  },
 ];
 
 
