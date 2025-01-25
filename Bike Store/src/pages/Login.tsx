@@ -4,7 +4,7 @@ import { useLoginMutation } from '../redux/features/auth/authApi';
 import { useAppDispatch } from '../redux/hooks';
 import { TUser, setUser } from '../redux/features/auth/authSlice';
 import { verifyToken } from '../utils/verifyToken';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import BSForm from '../components/form/BSFrom';
 import BSInput from '../components/form/BSInput';
@@ -21,15 +21,13 @@ const Login = () => {
   const [login] = useLoginMutation();
 
   const onSubmit = async (data: FieldValues) => {
-    console.log(data);
     const toastId = toast.loading('Logging in');
-
     try {
       const userInfo = {
         email: data.email,
         password: data.password,
       };
-      console.log(userInfo);
+      console.log(data);
       const res = await login(userInfo).unwrap();
 
       const user = verifyToken(res.data.accessToken) as TUser;
@@ -52,6 +50,9 @@ const Login = () => {
         <BSInput type="email" name="email" label="Email:" />
         <BSInput type="text" name="password" label="Password" />
         <Button htmlType="submit">Login</Button>
+        <div style={{ marginTop: '16px' }}>
+        <Link to="/register">Don't have an account? Register here</Link>
+      </div>
       </BSForm>
     </Row>
   );
