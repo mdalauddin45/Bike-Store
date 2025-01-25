@@ -14,8 +14,8 @@ const Login = () => {
   const dispatch = useAppDispatch();
 
   const defaultValues = {
-    userId: '2026010016',
-    password: 'student123',
+    email: 'alauddin@example.com',
+    password: '123456',
   };
 
   const [login] = useLoginMutation();
@@ -26,9 +26,10 @@ const Login = () => {
 
     try {
       const userInfo = {
-        id: data.userId,
+        email: data.email,
         password: data.password,
       };
+      console.log(userInfo);
       const res = await login(userInfo).unwrap();
 
       const user = verifyToken(res.data.accessToken) as TUser;
@@ -48,7 +49,7 @@ const Login = () => {
   return (
     <Row justify="center" align="middle" style={{ height: '100vh' }}>
       <BSForm onSubmit={onSubmit} defaultValues={defaultValues}>
-        <BSInput type="text" name="userId" label="ID:" />
+        <BSInput type="email" name="email" label="Email:" />
         <BSInput type="text" name="password" label="Password" />
         <Button htmlType="submit">Login</Button>
       </BSForm>

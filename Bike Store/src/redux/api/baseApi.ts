@@ -15,7 +15,6 @@ import {
     credentials: 'include',
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as RootState).auth.token;
-  
       if (token) {
         headers.set('authorization', `${token}`);
       }
@@ -23,14 +22,13 @@ import {
       return headers;
     },
   });
-  
+ 
   const baseQueryWithRefreshToken: BaseQueryFn<
     FetchArgs,
     BaseQueryApi,
     DefinitionType
   > = async (args, api, extraOptions): Promise<any> => {
     let result = await baseQuery(args, api, extraOptions);
-  
     if (result?.error?.status === 404) {
       toast.error(result?.error?.data.message);
     }
