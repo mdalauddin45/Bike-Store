@@ -1,23 +1,17 @@
-import { createElement } from "react";
-import {
-  UploadOutlined,
-  UserOutlined,
-  VideoCameraOutlined,
-} from "@ant-design/icons";
 import { Button, Layout } from "antd";
 import Sidebar from "./Sidebar";
-// import { useAppDispatch } from '../../redux/hooks';
-// import { logout } from '../../redux/features/auth/authSlice';
+import { useAppDispatch } from '../../redux/hooks';
+import { logout } from '../../redux/features/auth/authSlice';
 import { Outlet } from 'react-router-dom';
 
-const { Header, Content, Footer, Sider } = Layout;
+const { Header, Content } = Layout;
 
 const MainLayout = () => {
-    // const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
 
-    const handleLogout = () => {
-    
-    };
+  const handleLogout = () => {
+    dispatch(logout());
+  };
   return (
     <Layout style={{ height: '100%' }}>
     <Sidebar />
