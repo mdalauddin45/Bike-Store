@@ -19,7 +19,7 @@ export const adminPaths = [
         element: <CreateUser />,
       },
       {
-        name: 'Students',
+        name: 'All Users',
         path: 'students-data',
         element: <UserData />,
       },

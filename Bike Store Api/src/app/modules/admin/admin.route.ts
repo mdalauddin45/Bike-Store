@@ -5,6 +5,7 @@ const router = express.Router();
 
 
 router.patch('/users/:id/block',auth("admin"), AdminControllers.updateUser);
-router.delete('/bikes/:id',auth("admin"), AdminControllers.deleteBlog);
+router.delete('/bikes/:id',auth("admin"), AdminControllers.deleteBike);
+router.get('/users', AdminControllers.getAllUser);
 
 export const adminRoutes = router;

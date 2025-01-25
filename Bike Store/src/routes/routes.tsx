@@ -7,22 +7,22 @@ import { routeGenerator } from '../utils/routesGenerator';
 import { userPaths } from './user.routes';
 import ProtectedRoute from '../components/layout/ProtectedRoute';
 import ChangePassword from '../pages/ChangePassword';
-import Products from '../pages/user/bike/Products';
 import Product from '../pages/user/bike/Product';
+import Checkout from '../pages/user/bike/Checkout';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
-    children: [
-      {
-        path: "/products",
-        element: <Products />
+    children:[
+      { 
+        path: "products/:productId", 
+        element: <Product />,
       },
       {
-        path: "/products/:productId",
-        element: <Product />
-      }
+        path: "order/:productId",  
+        element: <Checkout />,
+      },
     ]
   },
   {
@@ -42,6 +42,7 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: routeGenerator(userPaths),
+    
   },
   {
     path: '/login',

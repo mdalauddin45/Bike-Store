@@ -4,6 +4,7 @@ import { StatusCodes } from "http-status-codes";
 import { AdminServices } from "./admin.service";
 import User from "../user/user.model";
 import { BikeServices } from "../bike/bike.service";
+import { Request, Response } from 'express';
 
 const updateUser = catchAsync(async (req, res) => {
     try {
@@ -40,7 +41,7 @@ const updateUser = catchAsync(async (req, res) => {
     }
   });
   
-  const deleteBlog = catchAsync(async (req, res) => {
+  const deleteBike = catchAsync(async (req, res) => {
     try {
       const id = req.params.id;
       const blog = await User.findById(id);
@@ -74,7 +75,24 @@ const updateUser = catchAsync(async (req, res) => {
       });
     }
   });
+  const getAllUser = async (req: Request, res: Response) => {
+    try {
+      const result = await AdminServices.getAllUserFromDB();
+      res.status(200).json({
+        success: true,
+        message: 'Users retrieved successfully',
+        data: result,
+      });
+    } catch (err: any) {
+      res.status(500).json({
+        success: false,
+        message: err.message || 'Something went wrong',
+        error: err,
+      });
+    }
+  };
   export const AdminControllers = {
     updateUser,
-    deleteBlog
+    deleteBike,
+    getAllUser
   }

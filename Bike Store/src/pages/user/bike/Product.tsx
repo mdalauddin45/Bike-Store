@@ -1,10 +1,13 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useGetBikeByIdQuery } from '../../../redux/api/bike/bikeApi';
 
 const Product = () => {
     const { productId } = useParams();
-    console.log(productId);
+    const navigate = useNavigate();
     const { data: bike, isLoading, error } = useGetBikeByIdQuery(productId);  
+    const handleBuyNow = () => {
+        navigate(`/order/${productId}`);
+      };
   
     if (isLoading) return <p>Loading bike details...</p>;
     if (error) return <p>Something went wrong while fetching the bike details!</p>;
@@ -14,28 +17,39 @@ const Product = () => {
         <h1>{bike?.name}</h1>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
           <p>
-            <strong>Brand:</strong> {bike?.brand}
+            <strong>Brand:</strong> {bike?.data.brand}
           </p>
           <p>
-            <strong>Category:</strong> {bike?.category}
+            <strong>Category:</strong> {bike?.data.category}
           </p>
           <p>
-            <strong>Price:</strong> ${bike?.price}
+            <strong>Price:</strong> ${bike?.data.price}
           </p>
           <p>
-            <strong>Stock:</strong> {bike?.inStock ? "In Stock" : "Out of Stock"}
+            <strong>Stock:</strong> {bike?.data.inStock ? "In Stock" : "Out of Stock"}
           </p>
         </div>
         <p>
-          <strong>Description:</strong> {bike?.description}
+          <strong>Description:</strong> {bike?.data.description}
         </p>
         <p>
-          <strong>Quantity:</strong> {bike?.quantity}
+          <strong>Quantity:</strong> {bike?.data.quantity}
         </p>
-  
-        <Link to="/user/products" style={{ marginTop: "20px", display: "inline-block", padding: "10px", backgroundColor: "#4CAF50", color: "white", textDecoration: "none", borderRadius: "4px" }}>
-          Back to Products
-        </Link>
+        <button
+            onClick={handleBuyNow}
+            style={{
+              marginTop: "20px",
+              padding: "12px 24px",
+              backgroundColor: "#4CAF50",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+              fontSize: "16px",
+            }}
+          >
+            Buy Now
+          </button>
       </div>
     );
   };

@@ -13,8 +13,12 @@ const deleteUserFromDB = async (id: string) => {
     const result = await Bike.findByIdAndDelete(id);
     return result;
   };
-
+const getAllUserFromDB = async () => {
+    const result = await User.find();
+    return result;
+  };
 export const AdminServices = {
     updateUserInDB,
-    deleteUserFromDB
+    deleteUserFromDB,
+    getAllUserFromDB
 }

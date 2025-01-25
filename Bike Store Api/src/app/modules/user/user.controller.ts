@@ -66,5 +66,5 @@ const loginUser = catchAsync(async (req, res) => {
 
 export const UserControllers = {
   createUser,
-  loginUser
+  loginUser,
 };

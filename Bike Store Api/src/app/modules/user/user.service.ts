@@ -49,5 +49,5 @@ const loginUser = async (payload: ILoginUser) => {
 
 export const UserServices = {
   createUserIntoDB,
-  loginUser,
+  loginUser
 };
