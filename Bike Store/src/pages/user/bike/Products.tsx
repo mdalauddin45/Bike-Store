@@ -11,7 +11,6 @@ const Products = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { data: bikes, isLoading, error } = useGetAllBikesQuery(searchTerm);
   const navigate = useNavigate();
-
   const handleSearch = (value: string) => {
     setSearchTerm(value);
   };
@@ -63,9 +62,6 @@ const Products = () => {
               >
                 <p>
                   <Text strong>Brand:</Text> {bike.brand}
-                </p>
-                <p>
-                  <Text strong>Model:</Text> {bike.model}
                 </p>
                 <p>
                   <Text strong>Price:</Text> ${bike.price}
