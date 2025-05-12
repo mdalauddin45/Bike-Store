@@ -101,56 +101,7 @@ const deleteBike = async (req: Request, res: Response) => {
     });
   }
 };
-const placeOrder = async (req: Request<{}, {}, IOrder>, res: Response) => {
-  try {
-    const { email, product, quantity, totalPrice } = req.body;
 
-    const validatedData = bikeValidation.createOrderSchema.parse({
-      email,
-      product,
-      quantity,
-      totalPrice,
-    });
-
-    const order = await BikeServices.placeOrder(
-      validatedData.email,
-      validatedData.product,
-      validatedData.quantity,
-      validatedData.totalPrice,
-    );
-
-    res.status(200).json({
-      success: true,
-      message: 'Order created successfully',
-      data: order,
-    });
-  } catch (err: any) {
-    res.status(400).json({
-      success: false,
-      message: err.message || 'Something went wrong',
-      error: err,
-    });
-  }
-};
-const getRevenue = async (req: Request, res: Response) => {
-  try {
-    const totalRevenue = await BikeServices.calculateTotalRevenue();
-
-    res.status(200).json({
-      success: true,
-      message: 'Revenue calculated successfully',
-      data: {
-        totalRevenue,
-      },
-    });
-  } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message || 'Something went wrong',
-      error: err,
-    });
-  }
-};
 
 export const BikeControllers = {
   createBike,
@@ -158,6 +109,4 @@ export const BikeControllers = {
   getSingleBike,
   deleteBike,
   updateBike,
-  placeOrder,
-  getRevenue,
 };

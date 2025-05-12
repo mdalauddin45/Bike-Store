@@ -1,8 +1,6 @@
-import { Children } from "react";
-import Checkout from "../pages/user/bike/Checkout";
-import Product from "../pages/user/bike/Product";
 import Products from "../pages/user/bike/Products";
 import UserDashboard from "../pages/user/UserDashboard";
+import Order from "../pages/user/bike/Order";
 
 export const userPaths = [
   {
@@ -14,6 +12,11 @@ export const userPaths = [
     name: "Products",
     path: "products",
     element: <Products />,
+  },
+  {
+    name: "Orders",
+    path: "orders",
+    element: <Order />,
   },
   
   

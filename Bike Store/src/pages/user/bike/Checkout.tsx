@@ -1,158 +1,152 @@
-import React, { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useGetBikeByIdQuery } from "../../../redux/api/bike/bikeApi";
-import { toast } from "sonner";
-import { Typography, Input, Button, Card, Form, Spin, Space } from "antd";
+import React, { useState, useEffect } from "react";
+import { Card, Row, Col, Form, Input, Button, Select, InputNumber, message } from "antd";
 
-const { Title, Paragraph, Text } = Typography;
+const { Option } = Select;
 
-const Checkout = () => {
-  const { productId } = useParams();
-  const { data: bike, isLoading, error } = useGetBikeByIdQuery(productId!);
-  const navigate = useNavigate();
-
-  const [email, setEmail] = useState("");
+const Checkout = ({ bike }: { bike: { name: string; price: number; stock: number } }) => {
+  const [form] = Form.useForm();
   const [quantity, setQuantity] = useState(1);
-  const [shippingAddress, setShippingAddress] = useState("");
-  const [totalPrice, setTotalPrice] = useState(0);
+  const [totalAmount, setTotalAmount] = useState(0);
 
-  const handleQuantityChange = (value: number) => {
-    const newQuantity = Math.max(1, value);
-    setQuantity(newQuantity);
-    if (bike) setTotalPrice(newQuantity * bike.data.price);
+  // Update total price whenever quantity changes
+  useEffect(() => {
+    setTotalAmount(bike?.price * quantity);
+  }, [quantity, bike?.price]);
+
+  // Handle payment processing with SurjoPay
+  const processPaymentWithSurjoPay = async (orderDetails: any) => {
+    try {
+      // Simulate a payment processing API call
+      const response = await fetch("https://surjopay.payment.gateway/api/pay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderDetails),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        message.success("Payment successful! Your order has been placed.");
+        form.resetFields();
+      } else {
+        message.error("Payment failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      message.error("An error occurred during payment processing.");
+    }
   };
 
-  const handleSubmit = async () => {
-    if (!email || !shippingAddress) {
-      toast.error("Please fill in all required fields.");
+  // Handle form submission
+  const handleSubmit = async (values: any) => {
+    if (quantity <= 0 || quantity > bike?.stock) {
+      message.error("Invalid quantity. Please check the stock.");
       return;
     }
 
-    if (bike && bike.data.inStock && quantity <= bike.data.inStock) {
-      try {
-        const response = await fetch("/api/orders", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email,
-            product: productId,
-            quantity,
-            totalPrice,
-            shippingAddress,
-          }),
-        });
+    const orderDetails = {
+      productName: bike?.name,
+      pricePerUnit: bike?.price,
+      quantity,
+      totalAmount,
+      ...values,
+    };
 
-        const data = await response.json();
-
-        if (response.ok) {
-          toast.success("Order placed successfully!");
-          navigate("/order-success");
-        } else {
-          toast.error(data.error || "Something went wrong!");
-        }
-      } catch (error) {
-        toast.error("Error placing the order. Please try again.");
-      }
+    if (values.paymentMethod === "SurjoPay") {
+      await processPaymentWithSurjoPay(orderDetails);
     } else {
-      toast.error("Not enough stock available.");
+      message.success("Order placed successfully!");
+      form.resetFields();
     }
   };
 
-  if (isLoading)
-    return (
-      <div style={{ textAlign: "center", marginTop: "50px" }}>
-        <Spin size="large" />
-        <Text>Loading checkout details...</Text>
-      </div>
-    );
-
-  if (error) {
-    toast.error("Failed to fetch product details.");
-    return (
-      <div style={{ textAlign: "center", marginTop: "50px" }}>
-        <Text type="danger">Something went wrong. Please try again later.</Text>
-      </div>
-    );
-  }
-
   return (
-    <div style={{ padding: "20px", maxWidth: "800px", margin: "auto" }}>
-      <Title level={2}>Checkout</Title>
-      <Card bordered>
-        <Title level={3}>{bike?.data.name}</Title>
-        <Paragraph>
-          <Text strong>Brand:</Text> {bike?.data.brand}
-        </Paragraph>
-        <Paragraph>
-          <Text strong>Price:</Text> ${bike?.data.price}
-        </Paragraph>
-        <Paragraph>
-          <Text strong>Description:</Text> {bike?.data.description}
-        </Paragraph>
-        <Paragraph>
-          <Text strong>Stock:</Text> {bike?.data.inStock ? "In stock" : "Out of stock"}
-        </Paragraph>
-      </Card>
+    <div style={{ padding: "24px", maxWidth: "900px", margin: "0 auto" }}>
+      <h1 style={{ textAlign: "center", marginBottom: "24px" }}>Checkout</h1>
+      <Row gutter={24}>
+        {/* User Information Form */}
+        <Col xs={24} md={12}>
+          <Card title="User Information">
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={handleSubmit}
+              initialValues={{
+                name: "",
+                email: "",
+                address: "",
+                paymentMethod: "SurjoPay",
+                quantity: 1,
+              }}
+            >
+              <Form.Item
+                name="name"
+                label="Full Name"
+                rules={[{ required: true, message: "Please enter your name." }]}
+              >
+                <Input placeholder="Enter your full name" />
+              </Form.Item>
+              <Form.Item
+                name="email"
+                label="Email"
+                rules={[
+                  { required: true, message: "Please enter your email." },
+                  { type: "email", message: "Please enter a valid email address." },
+                ]}
+              >
+                <Input placeholder="Enter your email" />
+              </Form.Item>
+              <Form.Item
+                name="address"
+                label="Shipping Address"
+                rules={[{ required: true, message: "Please enter your address." }]}
+              >
+                <Input.TextArea rows={3} placeholder="Enter your shipping address" />
+              </Form.Item>
+              <Form.Item
+                name="paymentMethod"
+                label="Payment Method"
+                rules={[{ required: true, message: "Please select a payment method." }]}
+              >
+                <Select placeholder="Select payment method">
+                  <Option value="SurjoPay">SurjoPay</Option>
+                  <Option value="Cash on Delivery">Cash on Delivery</Option>
+                </Select>
+              </Form.Item>
+              <Form.Item label="Quantity">
+                <InputNumber
+                  min={1}
+                  max={bike?.stock}
+                  value={quantity}
+                  onChange={(value) => setQuantity(value || 1)}
+                  style={{ width: "100%" }}
+                />
+              </Form.Item>
+              <Button type="primary" htmlType="submit" block>
+                Confirm Order
+              </Button>
+            </Form>
+          </Card>
+        </Col>
 
-      <div style={{ marginTop: "20px" }}>
-        <Title level={4}>Enter Shipping Information</Title>
-        <Form layout="vertical" onFinish={handleSubmit}>
-          <Form.Item
-            label="Your Email"
-            required
-            rules={[{ required: true, message: "Please enter your email" }]}
-          >
-            <Input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-            />
-          </Form.Item>
-
-          <Form.Item label="Quantity">
-            <Input
-              type="number"
-              value={quantity}
-              onChange={(e) => handleQuantityChange(Number(e.target.value))}
-              min={1}
-              max={bike?.data.inStock || 1}
-              placeholder="Enter quantity"
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Shipping Address"
-            required
-            rules={[{ required: true, message: "Please enter your shipping address" }]}
-          >
-            <Input
-              value={shippingAddress}
-              onChange={(e) => setShippingAddress(e.target.value)}
-              placeholder="Enter your shipping address"
-            />
-          </Form.Item>
-
-          <Space direction="vertical" size="middle" style={{ marginTop: "10px" }}>
-            <Paragraph>
-              <Text strong>Total Price:</Text> ${totalPrice}
-            </Paragraph>
-          </Space>
-
-          <Button
-            type="primary"
-            htmlType="submit"
-            style={{
-              marginTop: "20px",
-              padding: "10px 20px",
-            }}
-          >
-            Complete Purchase
-          </Button>
-        </Form>
-      </div>
+        {/* Order Summary */}
+        <Col xs={24} md={12}>
+          <Card title="Order Summary">
+            <p>
+              <strong>Product:</strong> {bike?.name}
+            </p>
+            <p>
+              <strong>Price per Unit:</strong> ${bike?.price}
+            </p>
+            <p>
+              <strong>Available Stock:</strong> {bike?.stock}
+            </p>
+            <h3 style={{ marginTop: "16px" }}>
+              <strong>Total Amount:</strong> ${totalAmount.toFixed(2)}
+            </h3>
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 };
